@@ -15,6 +15,7 @@ import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {AuthStackParams} from '../../navigation/AuthStack';
 import {TextInput} from 'react-native-paper';
+import SubmitButton from '../../components/SubmitButton';
 
 const Signup = () => {
   const navigation =
@@ -88,7 +89,11 @@ const Signup = () => {
             />
           }
         />
-
+          <SubmitButton
+            text="Signup"
+            style={styles.SubmitButton}
+            onPress={()=>{}}
+          />
         <View style={styles.viewLogin}>
           <Text style={styles.toLogin}>Already have an account </Text>
           <Text

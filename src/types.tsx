@@ -4,6 +4,7 @@ export type User = {
   notes: Note[];
 };
 export type Note = {
+  id:number
   date: string;
   title: string;
   body: string;

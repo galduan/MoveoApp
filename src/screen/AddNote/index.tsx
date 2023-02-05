@@ -10,39 +10,52 @@ import {
 } from 'react-native';
 import styles from './style';
 
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
-import {AuthStackParams} from '../../navigation/AuthStack';
 import {TextInput} from 'react-native-paper';
 import SubmitButton from '../../components/SubmitButton';
+import {HomeStackParams} from '../../navigation/HomeStack';
+import {Note} from '../../types';
 
 const AddNote = () => {
   const navigation =
-    useNavigation<NativeStackNavigationProp<AuthStackParams>>();
+    useNavigation<NativeStackNavigationProp<HomeStackParams>>();
+  const note: Note = useRoute<any>()?.params;
+  console.log(note);
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [emailerr, setEmailerr] = useState(false);
-  const [passworderr, setPassworderr] = useState(false);
+  const [title, setTitle] = useState(note.title || '');
+  const [body, setBody] = useState(note.body || '');
 
-  const [passwordVisible, setPasswordVisible] = useState(true);
-
-  const onPressLogin = () => {
-    const user: any = {
-      username: email,
-      password: password,
-    };
-    email == '' ? setEmailerr(true) : setEmailerr(false);
-    password == '' ? setPassworderr(true) : setPassworderr(false);
-    // email != '' && password != '' ? dispatch(login(user)) : null;
+  const onPressSave = () => {
+    navigation.goBack();
   };
 
   return (
     <View style={styles.container}>
       <SafeAreaView style={styles.container}>
-        <Text style={styles.textWelcome}>AddNote</Text>
-
+        <TextInput
+          style={styles.textInput}
+          onChangeText={setTitle}
+          value={title}
+          label="title"
+          maxLength={15}
+          error={title ? false : true}
+        />
+        <TextInput
+          mode="outlined"
+          label="body"
+          style={styles.body}
+          maxLength={1000}
+          onChangeText={setBody}
+          value={body}
+          error={title ? false : true}
+        />
+        <SubmitButton
+          style={styles.SubmitButton}
+          text="Save"
+          onPress={onPressSave}
+        />
       </SafeAreaView>
     </View>
   );

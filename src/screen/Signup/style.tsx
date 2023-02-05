@@ -24,6 +24,14 @@ const styles = StyleSheet.create({
     color: '#0A9DE9',
     fontSize: 16,
   },
+  SubmitButton: {
+    marginTop: 25,
+    marginHorizontal: 30,
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: 'rgba(0,0,0,0.05)',
+  },
 });
 
 export default styles;

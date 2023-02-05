@@ -6,7 +6,7 @@ const styles = StyleSheet.create({
   },
   textWelcome: {
     fontSize: 18,
-    marginTop: 80,
+    marginTop: 20,
     marginBottom: 20,
     textAlign: 'center',
   },

@@ -10,38 +10,29 @@ import {
 } from 'react-native';
 import styles from './style';
 
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
 import {AuthStackParams} from '../../navigation/AuthStack';
 import {TextInput} from 'react-native-paper';
 import SubmitButton from '../../components/SubmitButton';
+import { HomeStackParams } from '../../navigation/HomeStack';
+import { Note } from '../../types';
 
 const NoteScreen = () => {
   const navigation =
-    useNavigation<NativeStackNavigationProp<AuthStackParams>>();
-
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [emailerr, setEmailerr] = useState(false);
-  const [passworderr, setPassworderr] = useState(false);
-
-  const [passwordVisible, setPasswordVisible] = useState(true);
-
-  const onPressLogin = () => {
-    const user: any = {
-      username: email,
-      password: password,
-    };
-    email == '' ? setEmailerr(true) : setEmailerr(false);
-    password == '' ? setPassworderr(true) : setPassworderr(false);
-    // email != '' && password != '' ? dispatch(login(user)) : null;
+    useNavigation<NativeStackNavigationProp<HomeStackParams>>();
+    const note:Note = useRoute<any>()?.params
+    
+  const onPressEdit = () => {
+    navigation.navigate('AddNote',note)
   };
 
   return (
     <View style={styles.container}>
       <SafeAreaView style={styles.container}>
-        <Text style={styles.textWelcome}>NoteScreen</Text>
+        <Text style={styles.date}>date: {note.date}</Text>
+        <Text style={styles.body}>{note.body}</Text>
 
       </SafeAreaView>
     </View>
