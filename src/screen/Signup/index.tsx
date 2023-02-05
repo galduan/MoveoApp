@@ -19,12 +19,14 @@ import {TextInput} from 'react-native-paper';
 const Signup = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<AuthStackParams>>();
+  const [name, setName] = useState('');
+  const [nameErr, setNameErr] = useState(false);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [password2, setPassword2] = useState('');
-  const [emailerr, setEmailerr] = useState(false);
-  const [passworderr, setPassworderr] = useState(false);
+  const [emailErr, setEmailErr] = useState(false);
+  const [passwordErr, setPasswordErr] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(true);
 
   const onPress = () => {
@@ -34,61 +36,68 @@ const Signup = () => {
       password2: password2,
     };
 
-    email == '' ? setEmailerr(true) : setEmailerr(false);
-    password == '' ? setPassworderr(true) : setPassworderr(false);
+    email == '' ? setEmailErr(true) : setEmailErr(false);
+    password == '' ? setPasswordErr(true) : setPasswordErr(false);
   };
 
   return (
     <View style={styles.container}>
       <SafeAreaView style={styles.container}>
         <TextInput
-          style={{marginTop: 0}}
+          style={styles.textInput}
+          onChangeText={setName}
+          value={name}
+          placeholder="name"
+          error={emailErr}
+        />
+        <TextInput
+          style={styles.textInput}
           onChangeText={setEmail}
           value={email}
-          placeholder="אימייל"
+          placeholder="email"
           keyboardType="email-address"
-          error={emailerr}
+          error={emailErr}
         />
 
         <TextInput
-          style={{marginTop: 12}}
+          style={styles.textInput}
           onChangeText={setPassword}
           value={password}
-          placeholder="סיסמא"
+          placeholder="password"
           secureTextEntry={passwordVisible}
-          error={passworderr}
-          icon={
+          error={passwordErr}
+          right={
             <TextInput.Icon
-              name={passwordVisible ? 'eye' : 'eye-off'}
+              icon={passwordVisible ? 'eye' : 'eye-off'}
               onPress={() => setPasswordVisible(!passwordVisible)}
             />
           }
         />
 
         <TextInput
-          style={{marginTop: 12}}
+          style={styles.textInput}
           onChangeText={setPassword2}
           value={password2}
-          placeholder="אימות סיסמא"
-          passwordVisible={passwordVisible}
-          error={passworderr}
-          icon={
+          placeholder="repeat password"
+          secureTextEntry={passwordVisible}
+          error={passwordErr}
+          right={
             <TextInput.Icon
-              name={passwordVisible ? 'eye' : 'eye-off'}
+              icon={passwordVisible ? 'eye' : 'eye-off'}
               onPress={() => setPasswordVisible(!passwordVisible)}
             />
           }
         />
 
-        <View style={styles.signinScreen}>
+        <View style={styles.viewLogin}>
+          <Text style={styles.toLogin}>Already have an account </Text>
           <Text
             onPress={() => {
               navigation.navigate('Login');
             }}
-            style={styles.text3}>
-            התחבר
+            style={styles.toLogin2}>
+            Login
           </Text>
-          <Text style={styles.text3b}>יש לך כבר חשבון אצלנו?</Text>
         </View>
       </SafeAreaView>
     </View>

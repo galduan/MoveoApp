@@ -15,6 +15,7 @@ import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
 import {AuthStackParams} from '../../navigation/AuthStack';
 import {TextInput} from 'react-native-paper';
+import SubmitButton from '../../components/SubmitButton';
 
 const Login = () => {
   const navigation =
@@ -27,7 +28,7 @@ const Login = () => {
 
   const [passwordVisible, setPasswordVisible] = useState(true);
 
-  const onPressSignInB = () => {
+  const onPressLogin = () => {
     const user: any = {
       username: email,
       password: password,
@@ -73,6 +74,12 @@ const Login = () => {
           style={styles.fotgotpass}>
           forget password
         </Text>
+
+          <SubmitButton
+            text="Login"
+            style={styles.SubmitButton}
+            onPress={onPressLogin}
+          />
 
         <View style={styles.viewRegister}>
           <Text style={styles.toRegister}>Dont Have Account? </Text>

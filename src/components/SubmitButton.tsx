@@ -14,10 +14,9 @@ interface Props {
   text: String;
   onPress: any;
   style: any;
-  textStyle: any;
 }
 
-const SubmitButton: React.FC<Props> = ({onPress, text, style, textStyle}) => {
+const SubmitButton: React.FC<Props> = ({onPress, text, style}) => {
   return (
     <TouchableOpacity onPress={onPress}>
       <LinearGradient
@@ -25,7 +24,15 @@ const SubmitButton: React.FC<Props> = ({onPress, text, style, textStyle}) => {
         colors={['#85EDFA', '#0A9DE9']}
         start={{x: 0, y: 0}}
         end={{x: 1, y: 1}}>
-        <Text style={textStyle}>{text}</Text>
+        <Text
+          style={{
+            position: 'absolute',
+            fontSize: 16,
+            textAlign: 'center',
+            color: '#FFFFFF',
+          }}>
+          {text}
+        </Text>
       </LinearGradient>
     </TouchableOpacity>
   );

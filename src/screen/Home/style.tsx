@@ -13,8 +13,10 @@ const styles = StyleSheet.create({
   textInput: {
     marginTop: 38,
     marginHorizontal: 20,
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 10,
+    shadowColor: 'rgba(0,0,0,0.05)',
     borderRadius: 10,
-
   },
   fotgotpass: {
     textAlign: 'left',
