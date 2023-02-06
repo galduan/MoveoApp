@@ -22,7 +22,7 @@ const AddNoteButton: React.FC<Props> = ({onPress, style}) => {
       icon="plus"
       size={40}
       style={[
-        {position: 'absolute', bottom: 10, left: 10, borderWidth: 1},
+        {position: 'absolute', bottom: 10, left: 10, borderWidth: 1,backgroundColor:'#0A9DE9'},
         style,
       ]}
     />

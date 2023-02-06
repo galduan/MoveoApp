@@ -31,17 +31,15 @@ const Login = () => {
     email != '' &&
       password != '' &&
       auth()
-        .createUserWithEmailAndPassword(email, password)
+        .signInWithEmailAndPassword(email, password)
         .then(() => {
           console.log('User account created & signed in!');
         })
         .catch(error => {
-          if (error.code === 'auth/email-already-in-use') {
-            setError('That email address is already in use!');
-          } else if (error.code === 'auth/invalid-email') {
+          if (error.code === 'auth/invalid-email') {
             setError('That email address is invalid!');
-          } else if (error.code === 'auth/weak-password') {
-            setError('The given password is invalid!');
+          } else if (error.code === 'auth/wrong-password') {
+            setError('The given password is wrong!');
           } else {
             console.log(error);
             Alert.alert('try again later');

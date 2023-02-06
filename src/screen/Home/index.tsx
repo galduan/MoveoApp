@@ -23,7 +23,7 @@ const Home = () => {
     );
 
   const [name, setName] = useState('');
-  const [notes, setNote] = useState<any>();
+  const [notes, setNote] = useState<{note: Note; key: string}[]>([]);
 
   useEffect(() => {
     reference
@@ -33,10 +33,14 @@ const Home = () => {
       });
     reference
       .ref(`/users/${auth().currentUser?.uid}/notes`)
-      .orderByChild('date')
       .on('value', snapshot => {
-        console.log('User data: ', snapshot.val());
-        setNote(snapshot.val());
+        const sortedNotes: {note: Note; key: string}[] = [];
+        snapshot.val() &&
+          Object.keys(snapshot.val()).forEach(key => {
+            sortedNotes.push({note: snapshot.val()[key], key: key});
+          });
+        sortedNotes.sort((a, b) => (a.note.date < b.note.date ? 1 : -1));
+        setNote(sortedNotes);
       });
   }, []);
   const onPressAddNoteButton = () => {
@@ -54,13 +58,13 @@ const Home = () => {
           ListEmptyComponent={
             <Text style={styles.emptyList}>There is no Notes yet</Text>
           }
-          data={notes ? Object.keys(notes) : null}
+          data={notes}
           keyExtractor={(item, index) => index.toString()}
           renderItem={({item}) => {
             return (
               <NoteCard
-                note={notes[item]}
-                onPress={() => onPressNoteCard(notes[item], item)}
+                note={item.note}
+                onPress={() => onPressNoteCard(item.note, item.key)}
               />
             );
           }}

@@ -22,6 +22,7 @@ import auth from '@react-native-firebase/auth';
 import {firebase} from '@react-native-firebase/database';
 import NoteCard from '../../components/NoteCard';
 import {HomeStackParams} from '../../navigation/HomeStack';
+import {Note} from '../../types';
 
 const latitudeDelta = 0.025;
 const longitudeDelta = 0.025;
@@ -33,7 +34,7 @@ const Map = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<HomeStackParams>>();
 
-  const [notes, setNote] = useState<any>();
+  const [notes, setNote] = useState<{note: Note; key: string}[]>([]);
 
   const _map = React.useRef<any>(null);
   const _scrollView = React.useRef<any>(null);
@@ -57,8 +58,13 @@ const Map = () => {
       .ref(`/users/${auth().currentUser?.uid}/notes`)
       .orderByChild('date')
       .on('value', snapshot => {
-        console.log('User data: ', snapshot.val());
-        setNote(snapshot.val());
+        const sortedNotes: {note: Note; key: string}[] = [];
+        snapshot.val() &&
+          Object.keys(snapshot.val()).forEach(key => {
+            sortedNotes.push({note: snapshot.val()[key], key: key});
+          });
+        sortedNotes.sort((a, b) => (a.note.date < b.note.date ? 1 : -1));
+        setNote(sortedNotes);
       });
     Geolocation.getCurrentPosition(
       location => {
@@ -77,6 +83,38 @@ const Map = () => {
       {enableHighAccuracy: true, timeout: 30000, maximumAge: 10000},
     );
   }, []);
+  useEffect(() => {
+    mapAnimation.addListener(({value}) => {
+      let index = Math.floor(value / CARD_WIDTH + 0.3);
+      if (index >= notes.length) {
+        index = notes.length - 1;
+      }
+      if (index <= 0) {
+        index = 0;
+      }
+      const regionTimeout = setTimeout(() => {
+        if (mapIndex !== index) {
+          mapIndex = index;
+
+          _map.current.animateToRegion(
+            {
+              latitude: notes[index].note.location.lat,
+
+              longitude: notes[index].note.location.long,
+              latitudeDelta,
+              longitudeDelta,
+            },
+            350,
+          );
+        }
+      }, 10);
+      return () => {
+        if (regionTimeout) {
+          clearTimeout(regionTimeout);
+        }
+      };
+    });
+  });
 
   const onMarkerPress = (mapEventData: any) => {
     const markerID = mapEventData._targetInst.return.key;
@@ -91,22 +129,6 @@ const Map = () => {
       : null;
   };
 
-  const interpolations =
-    notes &&
-    Object.keys(notes).map((marker, index) => {
-      const inputRange = [
-        (index - 1) * CARD_WIDTH,
-        index * CARD_WIDTH,
-        (index + 1) * CARD_WIDTH,
-      ];
-      const scale = mapAnimation.interpolate({
-        inputRange,
-        outputRange: [1, 1.5, 1],
-        extrapolate: 'clamp',
-      });
-
-      return {scale};
-    });
 
   return (
     <View style={styles.container}>
@@ -117,34 +139,18 @@ const Map = () => {
         style={styles.map}
         mapPadding={{top: 0, right: 0, bottom: CARD_HEIGHT + 20, left: 0}}
         region={region}>
-        {notes &&
-          Object.keys(notes).map((key, index) => {
-            const scaleStyle = {
-              transform: [
-                {
-                  scale: interpolations[index].scale,
-                },
-              ],
-            };
-            if (notes[key].location.lat && notes[key].location.long)
-              return (
-                <Marker
-                  key={index}
-                  coordinate={{
-                    latitude: parseFloat(notes[key].location.lat.toString()),
-                    longitude: parseFloat(notes[key].location.long.toString()),
-                  }}
-                  onPress={(mapEventData: any) => onMarkerPress(mapEventData)}>
-                  {/* <Animated.View style={[styles.markerWrap]}>
-                  <Animated.Image
-                    source={require('../../../assets/MapScreen/marker.png')}
-                    style={[styles.marker, scaleStyle]}
-                    resizeMode="cover"
-                  />
-                </Animated.View> */}
-                </Marker>
-              );
-          })}
+        {notes.map((item, index) => {
+          return (
+            <Marker
+              key={index}
+              coordinate={{
+                latitude: parseFloat(item.note.location.lat.toString()),
+                longitude: parseFloat(item.note.location.long.toString()),
+              }}
+              onPress={(mapEventData: any) => onMarkerPress(mapEventData)}>
+            </Marker>
+          );
+        })}
       </MapView>
       <Animated.ScrollView
         ref={_scrollView}
@@ -177,23 +183,22 @@ const Map = () => {
           ],
           {useNativeDriver: true},
         )}>
-        {notes &&
-          Object.keys(notes).map((key, index) => {
-            return (
-              <View key={index}>
-                <NoteCard
-                  style={styles.card}
-                  note={notes[key]}
-                  onPress={() => {
-                    navigation.navigate('NoteScreen', {
-                      note: notes[key],
-                      key: key,
-                    });
-                  }}
-                />
-              </View>
-            );
-          })}
+        {notes.map((item, index) => {
+          return (
+            <View key={index}>
+              <NoteCard
+                style={styles.card}
+                note={item.note}
+                onPress={() => {
+                  navigation.navigate('NoteScreen', {
+                    note: item.note,
+                    key: item.key,
+                  });
+                }}
+              />
+            </View>
+          );
+        })}
       </Animated.ScrollView>
     </View>
   );

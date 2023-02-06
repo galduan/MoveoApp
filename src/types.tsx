@@ -4,7 +4,7 @@ export type User = {
   notes: any;
 };
 export type Note = {
-  date: string;
+  date: number;
   title: string;
   body: string;
   location: Location;

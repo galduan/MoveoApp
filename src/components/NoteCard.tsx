@@ -18,7 +18,7 @@ interface Props {
 }
 
 const NoteCard: React.FC<Props> = ({onPress, note, style}) => {
-  const date = new Date(parseInt(note.date));
+  const date = new Date(note.date);
   return (
     <TouchableOpacity onPress={onPress}>
       <LinearGradient
@@ -47,7 +47,8 @@ const styles = StyleSheet.create({
     marginBottom: 2,
     paddingVertical: 20,
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
+    paddingHorizontal:20,
     alignItems: 'center',
   },
 });

@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginHorizontal: 20,
-    justifyContent:'space-between',
+    justifyContent: 'space-between',
     paddingTop: 20,
   },
   dateText: {

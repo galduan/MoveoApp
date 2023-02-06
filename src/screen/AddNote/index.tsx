@@ -40,7 +40,7 @@ const AddNote = () => {
   const [title, setTitle] = useState(note?.note?.title || '');
   const [body, setBody] = useState(note?.note?.body || '');
 
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState(new Date(note?.note?.date||new Date()));
   const [open, setOpen] = useState(false);
 
   const [currentLongitude, setCurrentLongitude] = useState('...');
@@ -109,7 +109,7 @@ const AddNote = () => {
     const newNote: Note = {
       title: title,
       body: body,
-      date: date.getTime().toString(),
+      date: date.getTime(),
       location: {
         long: currentLongitude,
         lat: currentLatitude,
@@ -179,6 +179,7 @@ const AddNote = () => {
           mode="outlined"
           label="body"
           style={styles.body}
+          multiline
           maxLength={1000}
           onChangeText={setBody}
           value={body}
