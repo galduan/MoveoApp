@@ -10,30 +10,21 @@ import {
 } from 'react-native';
 import styles from './style';
 
-import {useNavigation, useRoute} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {useRoute} from '@react-navigation/native';
 
-import {AuthStackParams} from '../../navigation/AuthStack';
-import {TextInput} from 'react-native-paper';
-import SubmitButton from '../../components/SubmitButton';
-import { HomeStackParams } from '../../navigation/HomeStack';
-import { Note } from '../../types';
 
 const NoteScreen = () => {
-  const navigation =
-    useNavigation<NativeStackNavigationProp<HomeStackParams>>();
-    const note:Note = useRoute<any>()?.params
-    
-  const onPressEdit = () => {
-    navigation.navigate('AddNote',note)
-  };
+  // const navigation =
+  //   useNavigation<NativeStackNavigationProp<HomeStackParams>>();
+  const note = useRoute<any>()?.params;
+
+
 
   return (
     <View style={styles.container}>
       <SafeAreaView style={styles.container}>
-        <Text style={styles.date}>date: {note.date}</Text>
-        <Text style={styles.body}>{note.body}</Text>
-
+        <Text style={styles.date}>date: {note.note.date}</Text>
+        <Text style={styles.body}>{note.note.body}</Text>
       </SafeAreaView>
     </View>
   );

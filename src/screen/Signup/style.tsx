@@ -31,7 +31,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: 'rgba(0,0,0,0.05)',
-  },
+  },error:{
+    color:'red',
+    fontSize:16,
+    alignSelf:'center',
+    marginTop:20
+  }
 });
 
 export default styles;

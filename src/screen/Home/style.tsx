@@ -6,8 +6,8 @@ const styles = StyleSheet.create({
   },
   textWelcome: {
     fontSize: 18,
-    marginTop: 20,
-    marginBottom: 20,
+    paddingTop: 20,
+    paddingBottom: 20,
     textAlign: 'center',
   },
   textInput: {
@@ -18,25 +18,6 @@ const styles = StyleSheet.create({
     shadowColor: 'rgba(0,0,0,0.05)',
     borderRadius: 10,
   },
-  fotgotpass: {
-    textAlign: 'left',
-    marginLeft: 30,
-    marginTop: 14,
-  },
-  toRegister2: {
-    marginRight: 6,
-    color: '#0A9DE9',
-    fontSize: 16,
-  },
-  toRegister: {
-    fontSize: 16,
-  },
-  viewRegister: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 40,
-    marginBottom: 100,
-  },
   SubmitButton: {
     marginTop: 25,
     marginHorizontal: 30,
@@ -46,6 +27,13 @@ const styles = StyleSheet.create({
     shadowOffset: {width: 0, height: 2},
     shadowOpacity: 10,
     shadowColor: 'rgba(0,0,0,0.05)',
+  },
+  emptyList: {
+    fontSize: 20,
+    fontWeight: '700',
+    textAlign: 'center',
+    paddingTop: 100,
+    // borderWidth: 1,
   },
 });
 

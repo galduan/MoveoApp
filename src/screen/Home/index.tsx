@@ -1,74 +1,57 @@
 import React, {useState, useEffect} from 'react';
-import {
-  Image,
-  Text,
-  Dimensions,
-  View,
-  ActivityIndicator,
-  ScrollView,
-  SafeAreaView,
-  FlatList,
-} from 'react-native';
+import {Text, View, SafeAreaView, FlatList} from 'react-native';
 import styles from './style';
 
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
-import {AuthStackParams} from '../../navigation/AuthStack';
-import {TextInput} from 'react-native-paper';
-import SubmitButton from '../../components/SubmitButton';
-import {Note} from '../../types';
+import {Note, User} from '../../types';
 import NoteCard from '../../components/NoteCard';
-import AddNote from '../AddNote';
 import AddNoteButton from '../../components/AddNote';
 import {HomeStackParams} from '../../navigation/HomeStack';
+
+import auth from '@react-native-firebase/auth';
+import {firebase} from '@react-native-firebase/database';
 
 const Home = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<HomeStackParams>>();
-  const list: Note[] = [
-    {
-      id: 1,
-      date: '10/10/1999',
-      title: 'titl1',
-      body: 'body, xxxxx,xxx',
-      location: 's',
-    },
-    {
-      id: 2,
-      date: '10/10/1999',
-      title: 'title2',
-      body: 'body, xxxxx,xxx',
-      location: 's',
-    },
-    {
-      id: 3,
-      date: '10/10/1999',
-      title: 'title3',
-      body: 'body, xxxxx,xxx',
-      location: 's',
-    },
-  ];
-  const [name] = useState('');
-  const [notes, setNotes] = useState<Note[]>(list);
-  useEffect(() => {}, []);
+  const reference = firebase
+    .app()
+    .database(
+      'https://note-app-cf00a-default-rtdb.europe-west1.firebasedatabase.app/',
+    );
 
+  const [user, setUser] = useState<User>();
+
+  useEffect(() => {
+    reference.ref(`/users/${auth().currentUser?.uid}`).on('value', snapshot => {
+      console.log('User data: ', snapshot.val());
+      setUser(snapshot.val());
+    });
+  }, []);
   const onPressAddNoteButton = () => {
     navigation.navigate('AddNote');
   };
-  const onPressNoteCard = (pressed: Note) => {
-    navigation.navigate('NoteScreen', pressed);
+  const onPressNoteCard = (pressed: Note, key: string) => {
+    navigation.navigate('NoteScreen', {note: pressed, key: key});
   };
 
   return (
     <View style={styles.container}>
       <SafeAreaView style={styles.container}>
-        <Text style={styles.textWelcome}>Notes</Text>
+        <Text style={styles.textWelcome}>Welcome {user?.name}</Text>
         <FlatList
-          data={notes}
-          keyExtractor={item => item.id.toString()}
+        ListEmptyComponent={<Text style={styles.emptyList}>There is no Notes yet</Text>}
+          data={user?.notes ? Object.keys(user.notes) : null}
+          keyExtractor={(item, index) => index.toString()}
           renderItem={({item}) => {
-            return <NoteCard note={item} onPress={()=>onPressNoteCard(item)} />;
+            return (
+              <NoteCard
+                note={user?.notes[item]}
+                onPress={() => onPressNoteCard(user?.notes[item], item)}
+              />
+            );
           }}
         />
         <AddNoteButton onPress={onPressAddNoteButton} />

@@ -14,7 +14,6 @@ const styles = StyleSheet.create({
     marginTop: 38,
     marginHorizontal: 20,
     borderRadius: 10,
-
   },
   fotgotpass: {
     textAlign: 'left',
@@ -41,7 +40,12 @@ const styles = StyleSheet.create({
     height: 50,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: 'rgba(0,0,0,0.05)',
+  },
+  error: {
+    color: 'red',
+    fontSize: 16,
+    alignSelf: 'center',
+    marginTop: 20,
   },
 });
 

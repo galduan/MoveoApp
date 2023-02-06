@@ -1,12 +1,15 @@
 export type User = {
   email: string;
   name: string;
-  notes: Note[];
+  notes: any;
 };
 export type Note = {
-  id:number
   date: string;
   title: string;
   body: string;
-  location: string;
+  location: Location;
+};
+export type Location = {
+  long: string;
+  lat: string;
 };

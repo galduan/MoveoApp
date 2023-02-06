@@ -1,44 +1,66 @@
 import React, {useState} from 'react';
-import {
-  Image,
-  TouchableOpacity,
-  ImageBackground,
-  StyleSheet,
-  Text,
-  Dimensions,
-  View,
-  SafeAreaView,
-} from 'react-native';
+import {Text, Dimensions, View, SafeAreaView, Alert} from 'react-native';
 import styles from './style';
-
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {AuthStackParams} from '../../navigation/AuthStack';
 import {TextInput} from 'react-native-paper';
 import SubmitButton from '../../components/SubmitButton';
+import auth from '@react-native-firebase/auth';
+import {firebase} from '@react-native-firebase/database';
+import {User} from '../../types';
 
 const Signup = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<AuthStackParams>>();
+  const reference = firebase
+    .app()
+    .database(
+      'https://note-app-cf00a-default-rtdb.europe-west1.firebasedatabase.app/',
+    );
   const [name, setName] = useState('');
-  const [nameErr, setNameErr] = useState(false);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [password2, setPassword2] = useState('');
-  const [emailErr, setEmailErr] = useState(false);
-  const [passwordErr, setPasswordErr] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(true);
+  const [error, setError] = useState('');
 
-  const onPress = () => {
-    const user: any = {
-      email: email,
-      password: password,
-      password2: password2,
-    };
+  const onPressSumbit = () => {
+    email !== '' &&
+      password !== '' &&
+      password === password2 &&
+      name !== '' &&
+      auth()
+        .createUserWithEmailAndPassword(email, password)
+        .then(res => {
+          const newUser = {
+            email: email,
+            name: name,
+          };
 
-    email == '' ? setEmailErr(true) : setEmailErr(false);
-    password == '' ? setPasswordErr(true) : setPasswordErr(false);
+          reference
+            .ref(`/users/${auth().currentUser?.uid}`)
+            .set(newUser)
+            .then(() => {
+              console.log('User account created & signed in!');
+            })
+            .catch(error => {
+              console.log(error);
+            });
+        })
+        .catch(error => {
+          if (error.code === 'auth/email-already-in-use') {
+            setError('That email address is already in use!');
+          } else if (error.code === 'auth/invalid-email') {
+            setError('That email address is invalid!');
+          } else if (error.code === 'auth/weak-password') {
+            setError('The given password is invalid!');
+          } else {
+            console.log(error);
+            Alert.alert('try again later');
+          }
+        });
   };
 
   return (
@@ -49,7 +71,7 @@ const Signup = () => {
           onChangeText={setName}
           value={name}
           placeholder="name"
-          error={emailErr}
+          error={name ? false : true}
         />
         <TextInput
           style={styles.textInput}
@@ -57,7 +79,7 @@ const Signup = () => {
           value={email}
           placeholder="email"
           keyboardType="email-address"
-          error={emailErr}
+          error={email ? false : true}
         />
 
         <TextInput
@@ -66,7 +88,7 @@ const Signup = () => {
           value={password}
           placeholder="password"
           secureTextEntry={passwordVisible}
-          error={passwordErr}
+          error={password ? false : true}
           right={
             <TextInput.Icon
               icon={passwordVisible ? 'eye' : 'eye-off'}
@@ -81,7 +103,7 @@ const Signup = () => {
           value={password2}
           placeholder="repeat password"
           secureTextEntry={passwordVisible}
-          error={passwordErr}
+          error={password2 ? false : true}
           right={
             <TextInput.Icon
               icon={passwordVisible ? 'eye' : 'eye-off'}
@@ -89,11 +111,13 @@ const Signup = () => {
             />
           }
         />
-          <SubmitButton
-            text="Signup"
-            style={styles.SubmitButton}
-            onPress={()=>{}}
-          />
+
+        <Text style={styles.error}>{error}</Text>
+        <SubmitButton
+          text="Signup"
+          style={styles.SubmitButton}
+          onPress={onPressSumbit}
+        />
         <View style={styles.viewLogin}>
           <Text style={styles.toLogin}>Already have an account </Text>
           <Text

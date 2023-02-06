@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   ScrollView,
   SafeAreaView,
+  Alert,
 } from 'react-native';
 import styles from './style';
 
@@ -16,28 +17,37 @@ import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {AuthStackParams} from '../../navigation/AuthStack';
 import {TextInput} from 'react-native-paper';
 import SubmitButton from '../../components/SubmitButton';
-
+import auth from '@react-native-firebase/auth';
 const Login = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<AuthStackParams>>();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [emailerr, setEmailerr] = useState(false);
-  const [passworderr, setPassworderr] = useState(false);
-
+  const [error, setError] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(true);
 
   const onPressLogin = () => {
-    const user: any = {
-      username: email,
-      password: password,
-    };
-    email == '' ? setEmailerr(true) : setEmailerr(false);
-    password == '' ? setPassworderr(true) : setPassworderr(false);
-    // email != '' && password != '' ? dispatch(login(user)) : null;
+    email != '' &&
+      password != '' &&
+      auth()
+        .createUserWithEmailAndPassword(email, password)
+        .then(() => {
+          console.log('User account created & signed in!');
+        })
+        .catch(error => {
+          if (error.code === 'auth/email-already-in-use') {
+            setError('That email address is already in use!');
+          } else if (error.code === 'auth/invalid-email') {
+            setError('That email address is invalid!');
+          } else if (error.code === 'auth/weak-password') {
+            setError('The given password is invalid!');
+          } else {
+            console.log(error);
+            Alert.alert('try again later');
+          }
+        });
   };
-
   return (
     <View style={styles.container}>
       <SafeAreaView style={styles.container}>
@@ -49,7 +59,7 @@ const Login = () => {
           value={email}
           placeholder="email"
           keyboardType="email-address"
-          error={emailerr}
+          error={email ? false : true}
         />
 
         <TextInput
@@ -58,7 +68,7 @@ const Login = () => {
           value={password}
           placeholder="password"
           secureTextEntry={passwordVisible}
-          error={passworderr}
+          error={password ? false : true}
           right={
             <TextInput.Icon
               icon={passwordVisible ? 'eye' : 'eye-off'}
@@ -74,12 +84,13 @@ const Login = () => {
           style={styles.fotgotpass}>
           forget password
         </Text>
+        <Text style={styles.error}>{error}</Text>
 
-          <SubmitButton
-            text="Login"
-            style={styles.SubmitButton}
-            onPress={onPressLogin}
-          />
+        <SubmitButton
+          text="Login"
+          style={styles.SubmitButton}
+          onPress={onPressLogin}
+        />
 
         <View style={styles.viewRegister}>
           <Text style={styles.toRegister}>Dont Have Account? </Text>

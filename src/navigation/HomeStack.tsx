@@ -1,4 +1,6 @@
-import * as React from 'react';
+import React from 'react';
+import {Alert} from 'react-native';
+import auth from '@react-native-firebase/auth';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Home from '../screen/Home';
 import AddNote from '../screen/AddNote';
@@ -25,6 +27,30 @@ const BottomTabStack = () => {
         options={{
           tabBarIcon: ({color, size}) => <IconButton icon="home" size={size} />,
           tabBarLabel: 'Home',
+          headerShown: true,
+          title: 'Notes',
+          headerRight: () => (
+            <IconButton
+              icon="logout"
+              size={25}
+              onPress={() => {
+                Alert.alert('sure you want to Logout?', '', [
+                  {
+                    text: 'Cancel',
+                    style: 'cancel',
+                  },
+                  {
+                    text: 'Logout',
+                    onPress: () => {
+                      auth()
+                        .signOut()
+                        .then(() => console.log('User signed out!'));
+                    },
+                  },
+                ]);
+              }}
+            />
+          ),
         }}
       />
       <BottomTab.Screen
@@ -42,7 +68,7 @@ const BottomTabStack = () => {
 export type HomeStackParams = {
   BottomTab: NavigatorScreenParams<BottomTabParams>;
   AddNote: undefined | Note;
-  NoteScreen: Note;
+  NoteScreen: {note: Note; key: string};
   Map: undefined;
 };
 const HomeStack = createNativeStackNavigator<HomeStackParams>();
@@ -67,7 +93,7 @@ const HomeScreenStack = () => {
         component={NoteScreen}
         options={({navigation, route}) => ({
           headerShown: true,
-          title: route.params.title,
+          title: route.params.note.title,
           headerRight: () => (
             <IconButton
               onPress={() => navigation.navigate('AddNote', route.params)}
