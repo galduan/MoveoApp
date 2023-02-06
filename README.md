@@ -7,3 +7,8 @@ To Run the project:
 1. clone the repository 
 2. npx install
 3. yarn ios 
+
+
+Known bugs:
+1. not handling all errors and errors massage 
+2. not implementing all TypeScript Types
