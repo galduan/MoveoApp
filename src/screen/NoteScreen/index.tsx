@@ -14,8 +14,6 @@ import {useRoute} from '@react-navigation/native';
 
 
 const NoteScreen = () => {
-  // const navigation =
-  //   useNavigation<NativeStackNavigationProp<HomeStackParams>>();
   const note = useRoute<any>()?.params;
 
 

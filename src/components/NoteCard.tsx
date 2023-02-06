@@ -14,13 +14,15 @@ import {Note} from '../types';
 interface Props {
   note: Note;
   onPress: any;
+  style?: any;
 }
 
-const NoteCard: React.FC<Props> = ({onPress, note}) => {
+const NoteCard: React.FC<Props> = ({onPress, note, style}) => {
+  const date = new Date(parseInt(note.date));
   return (
     <TouchableOpacity onPress={onPress}>
       <LinearGradient
-        style={styles.container}
+        style={[styles.container, style]}
         colors={['#85EDFA', '#0A9DE9']}
         start={{x: 0, y: 0}}
         end={{x: 1, y: 1}}>
@@ -34,7 +36,7 @@ const NoteCard: React.FC<Props> = ({onPress, note}) => {
           style={{
             fontSize: 16,
           }}>
-          {note.date}
+          {date.toLocaleDateString()}
         </Text>
       </LinearGradient>
     </TouchableOpacity>
@@ -43,10 +45,10 @@ const NoteCard: React.FC<Props> = ({onPress, note}) => {
 const styles = StyleSheet.create({
   container: {
     marginBottom: 2,
-    paddingVertical:20,
+    paddingVertical: 20,
     flexDirection: 'row',
     justifyContent: 'space-around',
-    alignItems:'center'
+    alignItems: 'center',
   },
 });
 export default NoteCard;

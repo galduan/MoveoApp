@@ -7,44 +7,216 @@ import {
   ActivityIndicator,
   ScrollView,
   SafeAreaView,
+  Animated,
+  Platform,
+  StyleSheet,
 } from 'react-native';
-import styles from './style';
+import Geolocation from '@react-native-community/geolocation';
 
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
 import {AuthStackParams} from '../../navigation/AuthStack';
-import {TextInput} from 'react-native-paper';
-import SubmitButton from '../../components/SubmitButton';
+import MapView, {Marker} from 'react-native-maps';
+import auth from '@react-native-firebase/auth';
+import {firebase} from '@react-native-firebase/database';
+import NoteCard from '../../components/NoteCard';
+import {HomeStackParams} from '../../navigation/HomeStack';
 
+const latitudeDelta = 0.025;
+const longitudeDelta = 0.025;
+const CARD_HEIGHT = 140;
+const {width} = Dimensions.get('screen');
+const CARD_WIDTH = width * 0.8;
+const SPACING_FOR_CARD_INSET = width * 0.1 - 10;
 const Map = () => {
   const navigation =
-    useNavigation<NativeStackNavigationProp<AuthStackParams>>();
+    useNavigation<NativeStackNavigationProp<HomeStackParams>>();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [emailerr, setEmailerr] = useState(false);
-  const [passworderr, setPassworderr] = useState(false);
+  const [notes, setNote] = useState<any>();
 
-  const [passwordVisible, setPasswordVisible] = useState(true);
+  const _map = React.useRef<any>(null);
+  const _scrollView = React.useRef<any>(null);
+  let mapIndex = 0;
+  let mapAnimation = new Animated.Value(0);
 
-  const onPressLogin = () => {
-    const user: any = {
-      username: email,
-      password: password,
-    };
-    email == '' ? setEmailerr(true) : setEmailerr(false);
-    password == '' ? setPassworderr(true) : setPassworderr(false);
-    // email != '' && password != '' ? dispatch(login(user)) : null;
+  const reference = firebase
+    .app()
+    .database(
+      'https://note-app-cf00a-default-rtdb.europe-west1.firebasedatabase.app/',
+    );
+  const [region, setRegion] = useState({
+    longitude: 0,
+    latitude: 0,
+    longitudeDelta: 0.004,
+    latitudeDelta: 0.009,
+  });
+
+  useEffect(() => {
+    reference
+      .ref(`/users/${auth().currentUser?.uid}/notes`)
+      .orderByChild('date')
+      .on('value', snapshot => {
+        console.log('User data: ', snapshot.val());
+        setNote(snapshot.val());
+      });
+    Geolocation.getCurrentPosition(
+      location => {
+        const geolocationRegion = {
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          latitudeDelta,
+          longitudeDelta,
+        };
+        setRegion(geolocationRegion);
+        _map.current.animateToRegion(geolocationRegion);
+      },
+      err => {
+        _map.current.animateToRegion(region);
+      },
+      {enableHighAccuracy: true, timeout: 30000, maximumAge: 10000},
+    );
+  }, []);
+
+  const onMarkerPress = (mapEventData: any) => {
+    const markerID = mapEventData._targetInst.return.key;
+
+    let x = markerID * CARD_WIDTH + markerID * 20;
+    if (Platform.OS === 'ios') {
+      x = x - SPACING_FOR_CARD_INSET;
+    }
+
+    _scrollView.current
+      ? _scrollView.current.scrollTo({x: x, y: 0, animated: true})
+      : null;
   };
+
+  const interpolations =
+    notes &&
+    Object.keys(notes).map((marker, index) => {
+      const inputRange = [
+        (index - 1) * CARD_WIDTH,
+        index * CARD_WIDTH,
+        (index + 1) * CARD_WIDTH,
+      ];
+      const scale = mapAnimation.interpolate({
+        inputRange,
+        outputRange: [1, 1.5, 1],
+        extrapolate: 'clamp',
+      });
+
+      return {scale};
+    });
 
   return (
     <View style={styles.container}>
-      <SafeAreaView style={styles.container}>
-        <Text style={styles.textWelcome}>Map</Text>
-      </SafeAreaView>
+      <MapView
+        ref={_map}
+        showsMyLocationButton={true}
+        showsUserLocation={true}
+        style={styles.map}
+        mapPadding={{top: 0, right: 0, bottom: CARD_HEIGHT + 20, left: 0}}
+        region={region}>
+        {notes &&
+          Object.keys(notes).map((key, index) => {
+            const scaleStyle = {
+              transform: [
+                {
+                  scale: interpolations[index].scale,
+                },
+              ],
+            };
+            if (notes[key].location.lat && notes[key].location.long)
+              return (
+                <Marker
+                  key={index}
+                  coordinate={{
+                    latitude: parseFloat(notes[key].location.lat.toString()),
+                    longitude: parseFloat(notes[key].location.long.toString()),
+                  }}
+                  onPress={(mapEventData: any) => onMarkerPress(mapEventData)}>
+                  {/* <Animated.View style={[styles.markerWrap]}>
+                  <Animated.Image
+                    source={require('../../../assets/MapScreen/marker.png')}
+                    style={[styles.marker, scaleStyle]}
+                    resizeMode="cover"
+                  />
+                </Animated.View> */}
+                </Marker>
+              );
+          })}
+      </MapView>
+      <Animated.ScrollView
+        ref={_scrollView}
+        horizontal
+        pagingEnabled
+        scrollEventThrottle={1}
+        showsHorizontalScrollIndicator={false}
+        snapToInterval={CARD_WIDTH + 20}
+        snapToAlignment="center"
+        style={styles.scrollView}
+        contentInset={{
+          top: 0,
+          left: SPACING_FOR_CARD_INSET,
+          bottom: 0,
+          right: SPACING_FOR_CARD_INSET,
+        }}
+        contentContainerStyle={{
+          paddingHorizontal:
+            Platform.OS === 'android' ? SPACING_FOR_CARD_INSET : 0,
+        }}
+        onScroll={Animated.event(
+          [
+            {
+              nativeEvent: {
+                contentOffset: {
+                  x: mapAnimation,
+                },
+              },
+            },
+          ],
+          {useNativeDriver: true},
+        )}>
+        {notes &&
+          Object.keys(notes).map((key, index) => {
+            return (
+              <View key={index}>
+                <NoteCard
+                  style={styles.card}
+                  note={notes[key]}
+                  onPress={() => {
+                    navigation.navigate('NoteScreen', {
+                      note: notes[key],
+                      key: key,
+                    });
+                  }}
+                />
+              </View>
+            );
+          })}
+      </Animated.ScrollView>
     </View>
   );
 };
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  map: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  scrollView: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingVertical: 10,
+  },
+  card: {
+    height: CARD_HEIGHT,
+    width: CARD_WIDTH,
+    marginRight: 20,
+  },
+});
 
 export default Map;

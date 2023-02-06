@@ -109,7 +109,7 @@ const AddNote = () => {
     const newNote: Note = {
       title: title,
       body: body,
-      date: date.toLocaleDateString(),
+      date: date.getTime().toString(),
       location: {
         long: currentLongitude,
         lat: currentLatitude,

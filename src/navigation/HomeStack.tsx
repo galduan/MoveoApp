@@ -1,5 +1,5 @@
 import React from 'react';
-import {Alert} from 'react-native';
+import {Alert, View} from 'react-native';
 import auth from '@react-native-firebase/auth';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import Home from '../screen/Home';
@@ -10,6 +10,8 @@ import {NavigatorScreenParams} from '@react-navigation/native';
 import {IconButton} from 'react-native-paper';
 import {Note} from '../types';
 import NoteScreen from '../screen/NoteScreen';
+import {firebase} from '@react-native-firebase/database';
+
 export type BottomTabParams = {
   Home: undefined;
   Map: undefined;
@@ -95,11 +97,32 @@ const HomeScreenStack = () => {
           headerShown: true,
           title: route.params.note.title,
           headerRight: () => (
-            <IconButton
-              onPress={() => navigation.navigate('AddNote', route.params)}
-              icon="square-edit-outline"
-              size={22}
-            />
+            <View style={{flexDirection: 'row'}}>
+              <IconButton
+                onPress={() => navigation.navigate('AddNote', route.params)}
+                icon="square-edit-outline"
+                size={22}
+              />
+              <IconButton
+                onPress={() => {
+                  const reference = firebase
+                    .app()
+                    .database(
+                      'https://note-app-cf00a-default-rtdb.europe-west1.firebasedatabase.app/',
+                    );
+                  reference
+                    .ref(
+                      `/users/${auth().currentUser?.uid}/notes/${
+                        route.params.key
+                      }`,
+                    )
+                    .remove();
+                  navigation.goBack();
+                }}
+                icon="delete"
+                size={22}
+              />
+            </View>
           ),
         })}
       />
