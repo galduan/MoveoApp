@@ -17,7 +17,7 @@ import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
 import {AuthStackParams} from '../../navigation/AuthStack';
-import MapView, {Marker} from 'react-native-maps';
+import MapView, {Marker, PROVIDER_GOOGLE} from 'react-native-maps';
 import auth from '@react-native-firebase/auth';
 import {firebase} from '@react-native-firebase/database';
 import NoteCard from '../../components/NoteCard';
@@ -129,7 +129,6 @@ const Map = () => {
       : null;
   };
 
-
   return (
     <View style={styles.container}>
       <MapView
@@ -147,8 +146,9 @@ const Map = () => {
                 latitude: parseFloat(item.note.location.lat.toString()),
                 longitude: parseFloat(item.note.location.long.toString()),
               }}
-              onPress={(mapEventData: any) => onMarkerPress(mapEventData)}>
-            </Marker>
+              onPress={(mapEventData: any) =>
+                onMarkerPress(mapEventData)
+              }></Marker>
           );
         })}
       </MapView>

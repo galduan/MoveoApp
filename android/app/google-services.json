@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1026864807601",
+    "firebase_url": "https://note-app-cf00a-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "note-app-cf00a",
+    "storage_bucket": "note-app-cf00a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1026864807601:android:3a2b7a256db2d976052c90",
+        "android_client_info": {
+          "package_name": "com.moveoapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1026864807601-0mop850comed52hlbtch3u9t72h77pk1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCf0rohRcyCEMHUjA521WitE_t4-rFpLQo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1026864807601-0mop850comed52hlbtch3u9t72h77pk1.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1026864807601-eq6ah37ue07c2p9rntvvht3d3rli7397.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "org.reactjs.native.example.MoveoApp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

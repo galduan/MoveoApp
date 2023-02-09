@@ -40,7 +40,9 @@ const Login = () => {
             setError('That email address is invalid!');
           } else if (error.code === 'auth/wrong-password') {
             setError('The given password is wrong!');
-          } else {
+          } else if(error.code === 'auth/user-not-found'){
+            setError('User does not Exist!');
+          }else{
             console.log(error);
             Alert.alert('try again later');
           }
